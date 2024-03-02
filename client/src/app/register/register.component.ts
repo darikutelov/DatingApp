@@ -1,5 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgForm } from '@angular/forms';
+
+import { ToastrService } from 'ngx-toastr';
+
 import { AccountService } from '../_services/account.service';
 
 @Component({
@@ -11,7 +14,10 @@ export class RegisterComponent {
   @Input() users: any;
   @Output() cancelRegister = new EventEmitter<boolean>();
 
-  constructor(private accountService: AccountService) {}
+  constructor(
+    private accountService: AccountService,
+    private toastr: ToastrService
+  ) {}
 
   register(registerForm: NgForm) {
     if (registerForm.invalid) {
@@ -23,7 +29,10 @@ export class RegisterComponent {
         console.log(response);
         this.cancel();
       },
-      error: (error) => console.log(error),
+      error: (error) => {
+        console.log(error);
+        this.toastr.error(error.error);
+      },
     });
   }
 

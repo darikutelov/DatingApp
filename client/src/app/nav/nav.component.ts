@@ -1,5 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
+
+import { ToastrService } from 'ngx-toastr';
+
 import { AccountService } from '../_services/account.service';
 
 @Component({
@@ -10,7 +14,11 @@ import { AccountService } from '../_services/account.service';
 export class NavComponent {
   @ViewChild('loginForm') form: NgForm | undefined;
 
-  constructor(public accountService: AccountService) {}
+  constructor(
+    public accountService: AccountService,
+    private router: Router,
+    private toastr: ToastrService
+  ) {}
 
   login() {
     if (!this.form) {
@@ -22,12 +30,17 @@ export class NavComponent {
       .subscribe({
         next: (response) => {
           console.log(`Login response: ${response.username}`);
+          this.router.navigateByUrl('/members');
         },
-        error: (error) => console.log(error),
+        error: (error) => {
+          this.toastr.error(error.error);
+          console.log(error);
+        },
       });
   }
 
   logout() {
     this.accountService.logout();
+    this.router.navigateByUrl('/');
   }
 }
