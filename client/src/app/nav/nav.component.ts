@@ -33,7 +33,8 @@ export class NavComponent {
           this.router.navigateByUrl('/members');
         },
         error: (error) => {
-          this.toastr.error(error.error);
+          //error is handled by interceptor
+          //this.toastr.error(error.error);
           console.log(error);
         },
       });
