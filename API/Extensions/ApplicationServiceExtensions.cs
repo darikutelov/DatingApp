@@ -19,7 +19,8 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ITokenService, TokenService>();
         // scoped to each request and disposed after the request
         // Implementing the interface will automatically inject the service - see AccountController
-
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         return services;
     }
 }

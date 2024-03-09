@@ -2,14 +2,12 @@
 
 public static class DateTimeExtensions
 {
-    public static int CalculateAge(this DateOnly dob)
+    public static int CalculateAge(this DateTime dob)
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-
+        var today = DateTime.Today;
         var age = today.Year - dob.Year;
 
-        if (dob > today.AddYears(-age)) age--;
-
+        if (dob.Date > today.AddYears(-age)) age--;
         return age;
     }
 }
