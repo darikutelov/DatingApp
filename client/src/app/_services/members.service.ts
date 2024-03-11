@@ -35,9 +35,21 @@ export class MembersService {
   }
 
   getMember(username: string) {
+    const member = this.members.find((x) => x.userName === username);
+    if (member !== undefined) return of(member);
+
     return this.http.get<Member>(
       this.baseUrl + 'users/' + username
       //,this.getHttpOptions()
+    );
+  }
+
+  updateMember(member: Member) {
+    return this.http.put(this.baseUrl + 'users', member).pipe(
+      map(() => {
+        const index = this.members.indexOf(member);
+        this.members[index] = { ...this.members[index], ...member };
+      })
     );
   }
 
