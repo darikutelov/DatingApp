@@ -21,6 +21,8 @@ public static class ApplicationServiceExtensions
         // Implementing the interface will automatically inject the service - see AccountController
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings")); // comes from appsettings.json
+        services.AddScoped<IPhotoService, PhotoService>();
         return services;
     }
 }
