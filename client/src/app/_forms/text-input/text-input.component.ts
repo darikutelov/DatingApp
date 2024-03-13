@@ -26,7 +26,7 @@ import { ControlValueAccessor, FormControl, NgControl } from '@angular/forms';
       Passwords do not match
     </div>
   </div>`,
-  styles: [''],
+  styles: [],
 })
 export class TextInputComponent implements ControlValueAccessor {
   @Input() label = '';
