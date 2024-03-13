@@ -1,5 +1,12 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 
 import { ToastrService } from 'ngx-toastr';
 
@@ -10,30 +17,59 @@ import { AccountService } from '../_services/account.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
 })
-export class RegisterComponent {
-  @Input() users: any;
+export class RegisterComponent implements OnInit {
   @Output() cancelRegister = new EventEmitter<boolean>();
+  registerForm: FormGroup = new FormGroup({});
 
   constructor(
     private accountService: AccountService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private fb: FormBuilder
   ) {}
 
-  register(registerForm: NgForm) {
-    if (registerForm.invalid) {
-      return;
-    }
+  ngOnInit(): void {
+    this.initializeForm();
+  }
 
-    this.accountService.register(registerForm.value).subscribe({
-      next: (response) => {
-        console.log(response);
-        this.cancel();
-      },
-      error: (error) => {
-        console.log(error);
-        this.toastr.error(error.error);
-      },
+  initializeForm() {
+    this.registerForm = new FormGroup({
+      username: new FormControl('', Validators.required),
+      password: new FormControl('', [
+        Validators.required,
+        Validators.minLength(4),
+        Validators.maxLength(8),
+      ]),
+      confirmPassword: new FormControl('', [
+        Validators.required,
+        this.matchValues('password'),
+      ]),
     });
+
+    this.registerForm.controls['password'].valueChanges.subscribe(() => {
+      this.registerForm.controls['confirmPassword'].updateValueAndValidity();
+    });
+  }
+  register() {
+    console.log(this.registerForm?.value);
+
+    // this.accountService.register(registerForm.value).subscribe({
+    //   next: (response) => {
+    //     console.log(response);
+    //     this.cancel();
+    //   },
+    //   error: (error) => {
+    //     console.log(error);
+    //     this.toastr.error(error.error);
+    //   },
+    // });
+  }
+
+  matchValues(matchTo: string): ValidatorFn {
+    return (control: AbstractControl) => {
+      return control?.value === control?.parent?.get(matchTo)?.value
+        ? null
+        : { notMatching: true };
+    };
   }
 
   cancel() {
