@@ -11,6 +11,7 @@ import {
 import { ToastrService } from 'ngx-toastr';
 
 import { AccountService } from '../_services/account.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -21,11 +22,13 @@ export class RegisterComponent implements OnInit {
   @Output() cancelRegister = new EventEmitter<boolean>();
   registerForm: FormGroup = new FormGroup({});
   maxDate: Date = new Date();
+  validationErrors: string[] | undefined;
 
   constructor(
     private accountService: AccountService,
     private toastr: ToastrService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -56,18 +59,25 @@ export class RegisterComponent implements OnInit {
     });
   }
   register() {
-    console.log(this.registerForm?.value);
+    const dob = this.GetDateOnly(
+      this.registerForm.controls['dateOfBirth'].value
+    );
 
-    // this.accountService.register(registerForm.value).subscribe({
-    //   next: (response) => {
-    //     console.log(response);
-    //     this.cancel();
-    //   },
-    //   error: (error) => {
-    //     console.log(error);
-    //     this.toastr.error(error.error);
-    //   },
-    // });
+    const values = {
+      ...this.registerForm.value,
+      dateOfBirth: this.GetDateOnly(dob),
+    };
+
+    console.log(values);
+    this.accountService.register(values).subscribe({
+      next: (response) => {
+        this.router.navigateByUrl('/members');
+      },
+      error: (error) => {
+        this.validationErrors = error;
+        console.log(error);
+      },
+    });
   }
 
   matchValues(matchTo: string): ValidatorFn {
@@ -76,6 +86,16 @@ export class RegisterComponent implements OnInit {
         ? null
         : { notMatching: true };
     };
+  }
+
+  private GetDateOnly(dob: string | undefined) {
+    if (!dob) return;
+    let theDob = new Date(dob);
+    return new Date(
+      theDob.setMinutes(theDob.getMinutes() - theDob.getTimezoneOffset())
+    )
+      .toISOString()
+      .slice(0, 10);
   }
 
   cancel() {
