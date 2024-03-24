@@ -2,6 +2,7 @@
 using API.Data;
 using API.Interfaces;
 using API.Services;
+using API.Helpers;
 
 namespace API.Extensions;
 
@@ -23,6 +24,7 @@ public static class ApplicationServiceExtensions
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings")); // comes from appsettings.json
         services.AddScoped<IPhotoService, PhotoService>();
+        services.AddScoped<LogUserActivity>();
         return services;
     }
 }

@@ -19,21 +19,14 @@ export class MemberListComponent implements OnInit {
   members: Member[] = [];
   pagination: Pagination | undefined;
   userParams: UserParams | undefined;
-  user: User | null | undefined;
+  genderList = [
+    { value: 'male', display: 'Males' },
+    { value: 'female', display: 'Females' },
+  ];
 
   // Init
-  constructor(
-    readonly memberService: MembersService,
-    readonly accountService: AccountService
-  ) {
-    this.accountService.currentUser$.pipe(take(1)).subscribe({
-      next: (user) => {
-        if (user) {
-          this.user = user;
-          this.userParams = new UserParams(user);
-        }
-      },
-    });
+  constructor(readonly memberService: MembersService) {
+    this.userParams = this.memberService.getUserParams();
   }
 
   // Life Cycle
@@ -43,20 +36,27 @@ export class MemberListComponent implements OnInit {
   }
 
   loadMembers() {
-    if (!this.userParams) return;
-
-    this.memberService.getMembers(this.userParams).subscribe((response) => {
-      if (response.result) {
-        this.members = response.result;
-        this.pagination = response.pagination;
-      }
-    });
+    if (this.userParams) {
+      this.memberService.setUserParams(this.userParams);
+      this.memberService.getMembers(this.userParams).subscribe((response) => {
+        if (response.result) {
+          this.members = response.result;
+          this.pagination = response.pagination;
+        }
+      });
+    }
   }
 
   pageChanged(event: any) {
     if (this.userParams && this.userParams?.pageNumber !== event.page) {
       this.userParams.pageNumber = event.page;
+      this.memberService.setUserParams(this.userParams);
       this.loadMembers();
     }
+  }
+
+  resetFilter() {
+    this.userParams = this.memberService.resetUserParams();
+    this.loadMembers();
   }
 }
