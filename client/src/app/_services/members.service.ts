@@ -31,6 +31,8 @@ export class MembersService {
         if (user) {
           this.user = user;
           this.userParams = new UserParams(user);
+        } else {
+          this.userParams = undefined;
         }
       },
     });
@@ -89,14 +91,6 @@ export class MembersService {
   }
 
   // Private Methods
-
-  /**
-   * Generic function to get paginated results from specific url.
-   *
-   * @param {string} url - URL for the HTTP request
-   * @param {HttpParams} params - Parameters for the HTTP request
-   * @return {Observable<PaginatedResult<T>>} Observable of the paginated results
-   */
   private GetPaginatedResults<T>(url: string, params: HttpParams) {
     let paginatedResult: PaginatedResult<T> = new PaginatedResult<T>();
     return this.http
@@ -150,6 +144,19 @@ export class MembersService {
       return this.userParams;
     }
     return;
+  }
+
+  // Like Management
+
+  addLike(username: string) {
+    return this.http.post(this.baseUrl + 'likes/' + username, {});
+  }
+
+  getLikes(predicate: string, pageNumber: number, pageSize: number) {
+    let params = this.getPaginationHeaders(pageNumber, pageSize);
+    params = params.append('predicate', predicate);
+
+    return this.GetPaginatedResults<Member[]>('likes', params);
   }
 
   // Private Methods

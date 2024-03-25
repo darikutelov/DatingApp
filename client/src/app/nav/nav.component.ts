@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
 import { AccountService } from '../_services/account.service';
+import { MembersService } from '../_services/members.service';
 
 @Component({
   selector: 'app-nav',
@@ -14,11 +15,7 @@ import { AccountService } from '../_services/account.service';
 export class NavComponent {
   @ViewChild('loginForm') form: NgForm | undefined;
 
-  constructor(
-    public accountService: AccountService,
-    private router: Router,
-    private toastr: ToastrService
-  ) {}
+  constructor(public accountService: AccountService, private router: Router) {}
 
   login() {
     if (!this.form) {
