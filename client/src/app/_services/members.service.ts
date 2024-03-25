@@ -6,9 +6,9 @@ import { map, of, take } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { User } from '../_models/user';
 import { Member } from '../_models/member';
-import { PaginatedResult } from '../_models/pagination';
 import { UserParams } from '../_models/userParams';
 import { AccountService } from './account.service';
+import { getPaginatedResults, getPaginationHeaders } from './paginationHelper';
 
 @Injectable({
   providedIn: 'root',
@@ -47,7 +47,7 @@ export class MembersService {
 
     // If not in cache, get from server
     // Build query params
-    let params = this.getPaginationHeaders(
+    let params = getPaginationHeaders(
       userParams.pageNumber,
       userParams.pageSize
     );
@@ -57,7 +57,11 @@ export class MembersService {
     params = params.append('gender', userParams.gender);
     params = params.append('orderBy', userParams.orderBy);
 
-    return this.GetPaginatedResults<Member[]>('users', params).pipe(
+    return getPaginatedResults<Member[]>(
+      this.baseUrl + 'users',
+      params,
+      this.http
+    ).pipe(
       map((response) => {
         this.memberCache.set(cacheKey, response);
         return response;
@@ -91,35 +95,6 @@ export class MembersService {
   }
 
   // Private Methods
-  private GetPaginatedResults<T>(url: string, params: HttpParams) {
-    let paginatedResult: PaginatedResult<T> = new PaginatedResult<T>();
-    return this.http
-      .get<T>(this.baseUrl + url, { observe: 'response', params })
-      .pipe(
-        map((response) => {
-          if (response.body) {
-            paginatedResult.result = response.body;
-          }
-
-          const pagination = response.headers.get('Pagination');
-
-          if (pagination) {
-            paginatedResult.pagination = JSON.parse(pagination);
-          }
-          return paginatedResult;
-        })
-      );
-  }
-
-  private getPaginationHeaders(pageNumber: number, pageSize: number) {
-    let params = new HttpParams();
-
-    params = params.append('pageNumber', pageNumber.toString());
-    params = params.append('pageSize', pageSize.toString());
-
-    return params;
-  }
-
   // Photo Management
   setMainPhoto(photoId: number) {
     return this.http.put(this.baseUrl + 'users/set-main-photo/' + photoId, {});
@@ -147,16 +122,19 @@ export class MembersService {
   }
 
   // Like Management
-
   addLike(username: string) {
     return this.http.post(this.baseUrl + 'likes/' + username, {});
   }
 
   getLikes(predicate: string, pageNumber: number, pageSize: number) {
-    let params = this.getPaginationHeaders(pageNumber, pageSize);
+    let params = getPaginationHeaders(pageNumber, pageSize);
     params = params.append('predicate', predicate);
 
-    return this.GetPaginatedResults<Member[]>('likes', params);
+    return getPaginatedResults<Member[]>(
+      this.baseUrl + 'likes',
+      params,
+      this.http
+    );
   }
 
   // Private Methods
