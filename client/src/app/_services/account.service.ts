@@ -4,6 +4,7 @@ import { BehaviorSubject, map } from 'rxjs';
 
 import { User } from '../_models/user';
 import { environment } from 'src/environments/environment';
+import { PresenceService } from './presence.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,10 @@ export class AccountService {
   private currentUserSource = new BehaviorSubject<User | null>(null);
   currentUser$ = this.currentUserSource.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private presenseService: PresenceService
+  ) {}
 
   login(username: string, password: string) {
     const creds = { username, password };
@@ -49,10 +53,14 @@ export class AccountService {
     Array.isArray(roles) ? (user.roles = roles) : user.roles.push(roles);
     localStorage.setItem('user', JSON.stringify(user));
     this.currentUserSource.next(user);
+
+    // Connection to SignalR
+    this.presenseService.createHubConnection(user);
   }
 
   logout() {
     localStorage.removeItem('user');
+    this.presenseService.stopHubConnection();
     this.currentUserSource.next(null);
   }
 

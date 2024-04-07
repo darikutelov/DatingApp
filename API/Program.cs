@@ -2,6 +2,7 @@ using API.Data;
 using API.Entities;
 using API.Extensions;
 using API.MiddleWare;
+using API.SignalR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,7 +24,11 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors(builder => builder.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200"));
+app.UseCors(builder => builder.AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials() // to enable SignalR to 
+    .WithOrigins("https://localhost:4200")
+    );
 
 if (app.Environment.IsDevelopment())
 {
@@ -38,6 +43,10 @@ app.UseAuthentication(); // do you have a valid token
 app.UseAuthorization(); // you have a token -> what can you do
 
 app.MapControllers();
+
+// Add SignalR 
+app.MapHub<PresenceHub>("hubs/presence");
+app.MapHub<MessageHub>("hubs/message");
 
 using var scope = app.Services.CreateScope();
 var service = scope.ServiceProvider;

@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { Member } from 'src/app/_models/member';
 import { MembersService } from 'src/app/_services/members.service';
+import { PresenceService } from 'src/app/_services/presence.service';
 
 @Component({
   selector: 'app-member-card',
@@ -11,12 +12,10 @@ import { MembersService } from 'src/app/_services/members.service';
 export class MemberCardComponent {
   @Input() member: Member | undefined;
 
-  /**
-   *
-   */
   constructor(
     private membersService: MembersService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    public presenceService: PresenceService // to be able to use in async pipe
   ) {}
 
   addLike(member: Member) {

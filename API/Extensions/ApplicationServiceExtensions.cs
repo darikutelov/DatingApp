@@ -3,6 +3,7 @@ using API.Data;
 using API.Interfaces;
 using API.Services;
 using API.Helpers;
+using API.SignalR;
 
 namespace API.Extensions;
 
@@ -27,6 +28,9 @@ public static class ApplicationServiceExtensions
         services.AddScoped<LogUserActivity>();
         services.AddScoped<ILikesRepository, LikesRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddSignalR();
+        services.AddSingleton<PresenceTracker>(); // not to be destroyed with http request
+
         return services;
     }
 }

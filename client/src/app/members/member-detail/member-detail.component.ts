@@ -8,9 +8,12 @@ import { TimeagoModule } from 'ngx-timeago';
 
 import { Member } from 'src/app/_models/member';
 import { Message } from 'src/app/_models/message';
-import { MembersService } from 'src/app/_services/members.service';
 import { MessageService } from 'src/app/_services/message.service';
 import { MemberMessagesComponent } from '../member-messages/member-messages.component';
+import { PresenceService } from 'src/app/_services/presence.service';
+import { AccountService } from 'src/app/_services/account.service';
+import { take } from 'rxjs';
+import { User } from 'src/app/_models/user';
 
 @Component({
   selector: 'app-member-detail',
@@ -31,12 +34,20 @@ export class MemberDetailComponent {
   images: GalleryItem[] = [];
   messages: Message[] = [];
   activeTab?: TabDirective;
+  user?: User;
 
   constructor(
-    private memberService: MembersService,
+    private accountService: AccountService,
     private route: ActivatedRoute,
-    private messageService: MessageService
-  ) {}
+    private messageService: MessageService,
+    public presenceService: PresenceService
+  ) {
+    this.accountService.currentUser$.pipe(take(1)).subscribe({
+      next: (user) => {
+        if (user) this.user = user;
+      },
+    });
+  }
 
   ngOnInit(): void {
     this.route.data.subscribe({
@@ -50,6 +61,10 @@ export class MemberDetailComponent {
     });
 
     this.getImages();
+  }
+
+  ngOnDestroy(): void {
+    this.messageService.stopHubConnection();
   }
 
   // loadMember() {
@@ -75,10 +90,14 @@ export class MemberDetailComponent {
     }
   }
 
+  // User navigates to message tab
   onTabActivated(data: TabDirective) {
     this.activeTab = data;
-    if (this.activeTab.heading === 'Messages') {
-      this.loadMessages();
+    if (this.activeTab.heading === 'Messages' && this.user) {
+      //this.loadMessages();
+      this.messageService.createHubConnection(this.user, this.member.userName);
+    } else {
+      this.messageService.stopHubConnection();
     }
   }
 
