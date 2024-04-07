@@ -56,6 +56,7 @@ export class MemberDetailComponent {
 
     this.route.queryParams.subscribe({
       next: (params) => {
+        console.log(params['tab']);
         params['tab'] && this.selectTab(params['tab']);
       },
     });
@@ -86,6 +87,7 @@ export class MemberDetailComponent {
 
   selectTab(heading: string) {
     if (this.memberTabs) {
+      console.log(this.memberTabs);
       this.memberTabs.tabs.find((x) => x.heading === heading)!.active = true;
     }
   }
