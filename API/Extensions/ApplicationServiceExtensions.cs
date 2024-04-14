@@ -21,16 +21,14 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ITokenService, TokenService>();
         // scoped to each request and disposed after the request
         // Implementing the interface will automatically inject the service - see AccountController
-        services.AddScoped<IUserRepository, UserRepository>();
+        // services.AddScoped<IUserRepository, UserRepository>();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings")); // comes from appsettings.json
         services.AddScoped<IPhotoService, PhotoService>();
         services.AddScoped<LogUserActivity>();
-        services.AddScoped<ILikesRepository, LikesRepository>();
-        services.AddScoped<IMessageRepository, MessageRepository>();
         services.AddSignalR();
         services.AddSingleton<PresenceTracker>(); // not to be destroyed with http request
-
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
         return services;
     }
 }
