@@ -5,7 +5,7 @@ public interface IUnitOfWork
     IUserRepository UserRepository { get; }
     ILikesRepository LikesRepository { get; }
     IMessageRepository MessageRepository { get; }
-    //IPhotoService PhotoService { get; }
+    IPhotoRepository PhotoRepository { get; }
     Task<bool> Complete();
     bool HasChanges();
 }

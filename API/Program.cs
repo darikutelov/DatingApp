@@ -42,11 +42,17 @@ app.UseHttpsRedirection();
 app.UseAuthentication(); // do you have a valid token
 app.UseAuthorization(); // you have a token -> what can you do
 
+app.UseDefaultFiles(); // looks for index.html
+app.UseStaticFiles(); // serve static files, shall be exactly here
+
 app.MapControllers();
 
 // Add SignalR 
 app.MapHub<PresenceHub>("hubs/presence");
 app.MapHub<MessageHub>("hubs/message");
+
+// Fallback for angular routes
+app.MapFallbackToController("Index", "Fallback");
 
 using var scope = app.Services.CreateScope();
 var service = scope.ServiceProvider;

@@ -25,9 +25,9 @@ export class NavComponent {
     this.accountService
       .login(this.form.value.username, this.form.value.password)
       .subscribe({
-        next: (response) => {
-          console.log(`Login response: ${response.username}`);
+        next: (_) => {
           this.router.navigateByUrl('/members');
+          this.form?.reset();
         },
         error: (error) => {
           //error is handled by interceptor
