@@ -1,0 +1,28 @@
+# fly.toml app configuration file generated for connectappone on 2024-04-19T11:27:58+03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'connectappone'
+primary_region = 'ams'
+
+[build]
+  image = 'dkutelov/connectappone:latest'
+
+[env]
+  ASPNETCORE="http://+:8080"
+  CloudinarySettings__CloudName="dariku"
+  CloudinarySettings__ApiKey="643612134933195"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
